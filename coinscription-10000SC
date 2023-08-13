@@ -1,0 +1,56 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract CoinscriptionContract {
+    address public owner;
+    uint256 public transactionCount;
+    uint256 public requiredTransactions = 10000;
+
+    mapping(address => bool) public isMinter;
+    mapping(uint256 => string) public ethscriptionMetadata;
+
+    event EthscriptionMinted(address indexed minter, uint256 ethscriptionId);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the owner can call this function");
+        _;
+    }
+
+    modifier onlyMinter() {
+        require(isMinter[msg.sender], "Only authorized minters can call this function");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    function addMinter(address minter) external onlyOwner {
+        isMinter[minter] = true;
+    }
+
+    function mintEthscription(string calldata metadata) external onlyMinter payable {
+        require(msg.value >= 0.01 ether, "Minimum deposit of 0.01 ETH required");
+
+        uint256 ethscriptionId = transactionCount;
+        ethscriptionMetadata[ethscriptionId] = metadata;
+        transactionCount++;
+
+        emit EthscriptionMinted(msg.sender, ethscriptionId);
+    }
+
+    function collectEthscriptions() external onlyOwner {
+        require(transactionCount >= requiredTransactions, "Not enough transactions collected");
+
+        // Transfer JSON metadata and ownership
+        for (uint256 i = 0; i < requiredTransactions; i++) {
+            // Retrieve JSON metadata and transfer ETHscription
+            string memory metadata = ethscriptionMetadata[i];
+            // Transfer ETHscription to the owner
+
+            // Clear metadata and update ownership
+
+            // Emit events or perform other actions
+        }
+    }
+}
