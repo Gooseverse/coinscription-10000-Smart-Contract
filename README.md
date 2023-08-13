@@ -2,6 +2,8 @@
 
 The Coinscription Smart Contract is designed to facilitate the minting and collection of a large number of Ethscriptions while ensuring a minimum fee is paid per minting transaction. Once a specified number of minting transactions are reached, the contract will collect the metadata of each Ethscription and transfer ownership to the original minter.
 
+tips appreciated Gooseverse.eth
+
 ## Overview
 
 The Coinscription Smart Contract consists of the following main functionalities:
