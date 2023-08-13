@@ -1,0 +1,89 @@
+// Coinscription Smart Contract
+
+pragma solidity ^0.8.0;
+
+contract Coinscription {
+    address public owner;
+    bool public paused;
+
+    struct Ethscription {
+        uint256 id;
+        string metadata;
+    }
+    
+    Ethscription[] public ethscriptions;
+    mapping(uint256 => address) public ethscriptionOwners;
+
+    constructor() {
+        owner = msg.sender;
+        paused = false;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the contract owner can call this function");
+        _;
+    }
+
+    modifier whenNotPaused() {
+        require(!paused, "Contract is paused");
+        _;
+    }
+
+    // Mint Ethscription
+    function mintEthscription(string memory metadata) external payable whenNotPaused {
+        require(msg.value >= 0.01 ether, "Insufficient fee");
+        
+        uint256 ethscriptionId = ethscriptions.length;
+        ethscriptions.push(Ethscription(ethscriptionId, metadata));
+        ethscriptionOwners[ethscriptionId] = msg.sender;
+
+        // Handle fee payment
+        address payable contractAddress = payable(address(this));
+        contractAddress.transfer(msg.value);
+    }
+
+    // Get Ethscription Metadata
+    function getEthscriptionMetadata(uint256 id) external view returns (string memory) {
+        require(id < ethscriptions.length, "Invalid Ethscription ID");
+        return ethscriptions[id].metadata;
+    }
+
+    // Check Collection Status
+    function checkCollectionStatus() external view returns (uint256, uint256) {
+        return (ethscriptions.length, 10000); // Modify threshold as needed
+    }
+
+    // Process Collection
+    function processCollection() external onlyOwner {
+        require(ethscriptions.length >= 10000, "Collection not complete yet");
+
+        // Implement transfer logic to wallet that initiated collection
+    }
+
+    // Get Contract Balance
+    function getContractBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
+
+    // Withdraw Balance
+    function withdrawBalance(uint256 amount) external onlyOwner {
+        require(amount <= address(this).balance, "Insufficient balance");
+        address payable ownerAddress = payable(owner);
+        ownerAddress.transfer(amount);
+    }
+
+    // Pause Contract
+    function pauseContract() external onlyOwner {
+        paused = true;
+    }
+
+    // Resume Contract
+    function resumeContract() external onlyOwner {
+        paused = false;
+    }
+
+    // Get Contract Status
+    function getContractStatus() external view returns (bool) {
+        return paused;
+    }
+}
