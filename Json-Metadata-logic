@@ -1,0 +1,35 @@
+// Mint Ethscription
+function mintEthscription(string memory metadata) external payable whenNotPaused {
+    require(msg.value >= 0.01 ether, "Insufficient fee");
+    
+    uint256 ethscriptionId = ethscriptions.length;
+    ethscriptions.push(Ethscription(ethscriptionId, metadata));
+    ethscriptionOwners[ethscriptionId] = msg.sender;
+
+    // Handle fee payment
+    address payable contractAddress = payable(address(this));
+    contractAddress.transfer(msg.value);
+}
+
+// Ethscription struct
+struct Ethscription {
+    uint256 id;
+    string metadata;
+}
+
+
+{
+  "name": "My Awesome Ethscription",
+  "description": "A unique digital creation on the blockchain",
+  "image": "https://example.com/path/to/image.jpg",
+  "attributes": [
+    {
+      "trait_type": "Color",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Size",
+      "value": "Large"
+    }
+  ]
+}
