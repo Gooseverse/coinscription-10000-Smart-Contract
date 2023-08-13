@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coinscription Indexer</title>
+</head>
+<body>
+  <h1>Coinscription Indexer</h1>
+  <div id="ethscriptions"></div>
+  <button id="snapshot-button">Take Snapshot</button> <!-- Added snapshot button -->
+  
+  <script>
+    async function fetchEthscriptions() {
+      // Fetch Ethscriptions from the blockchain
+      const response = await fetch('/fetch-ethscriptions'); // Replace with your API endpoint
+      const ethscriptions = await response.json();
+      return ethscriptions;
+    }
+
+    async function displayEthscriptions() {
+      const ethscriptionsDiv = document.getElementById('ethscriptions');
+      const ethscriptions = await fetchEthscriptions();
+
+      // Loop through each Ethscription and display metadata
+      ethscriptions.forEach(ethscription => {
+        const ethscriptionElement = document.createElement('div');
+        ethscriptionElement.innerHTML = `
+          <h2>${ethscription.name}</h2>
+          <p>Description: ${ethscription.description}</p>
+          <img src="${ethscription.image}" alt="${ethscription.name}" width="200">
+          <p>Attributes:</p>
+          <ul>
+            ${ethscription.attributes.map(attribute => `<li>${attribute.trait_type}: ${attribute.value}</li>`).join('')}
+          </ul>
+          <hr>
+        `;
+        ethscriptionsDiv.appendChild(ethscriptionElement);
+      });
+    }
+
+    // Added snapshot functionality
+    const snapshotButton = document.getElementById('snapshot-button');
+    snapshotButton.addEventListener('click', takeSnapshot);
+
+    async function takeSnapshot() {
+      const response = await fetch('/take-snapshot', { method: 'POST' }); // Replace with your API endpoint
+      if (response.ok) {
+        alert('Snapshot taken successfully!');
+      } else {
+        alert('Snapshot failed.');
+      }
+    }
+
+    displayEthscriptions();
+  </script>
+</body>
+</html>
