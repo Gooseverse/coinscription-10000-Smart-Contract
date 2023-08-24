@@ -1,5 +1,3 @@
-// Coinscription Smart Contract
-
 pragma solidity ^0.8.0;
 
 contract Coinscription {
@@ -9,10 +7,11 @@ contract Coinscription {
     struct Ethscription {
         uint256 id;
         string metadata;
+        address creator;
     }
     
     Ethscription[] public ethscriptions;
-    mapping(uint256 => address) public ethscriptionOwners;
+    mapping(uint256 => bool) public ethscriptionExists;
 
     constructor() {
         owner = msg.sender;
@@ -29,35 +28,39 @@ contract Coinscription {
         _;
     }
 
-    // Mint Ethscription
+    // Mint Ethscription (ESIP 1)
     function mintEthscription(string memory metadata) external payable whenNotPaused {
         require(msg.value >= 0.01 ether, "Insufficient fee");
         
         uint256 ethscriptionId = ethscriptions.length;
-        ethscriptions.push(Ethscription(ethscriptionId, metadata));
-        ethscriptionOwners[ethscriptionId] = msg.sender;
+        require(!ethscriptionExists[ethscriptionId], "Ethscription already minted");
+
+        ethscriptions.push(Ethscription(ethscriptionId, metadata, msg.sender));
+        ethscriptionExists[ethscriptionId] = true;
 
         // Handle fee payment
         address payable contractAddress = payable(address(this));
         contractAddress.transfer(msg.value);
     }
 
-    // Get Ethscription Metadata
+    // Get Ethscription Metadata (ESIP 1)
     function getEthscriptionMetadata(uint256 id) external view returns (string memory) {
-        require(id < ethscriptions.length, "Invalid Ethscription ID");
+        require(ethscriptionExists[id], "Ethscription does not exist");
         return ethscriptions[id].metadata;
     }
 
-    // Check Collection Status
+    // Check Collection Status (ESIP 2)
     function checkCollectionStatus() external view returns (uint256, uint256) {
         return (ethscriptions.length, 10000); // Modify threshold as needed
     }
 
-    // Process Collection
+    // Process Collection (ESIP 2)
     function processCollection() external onlyOwner {
         require(ethscriptions.length >= 10000, "Collection not complete yet");
 
-        // Implement transfer logic to wallet that initiated collection
+        // Implement transfer ownership of Ethscriptions to the creators
+
+        // Emit events or perform other actions
     }
 
     // Get Contract Balance
