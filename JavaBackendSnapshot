@@ -1,0 +1,25 @@
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+const { takeSnapshot } = require('./snapshotService'); // Replace with your snapshot service logic
+
+app.use(bodyParser.json());
+
+// Route to take a snapshot
+app.post('/take-snapshot', async (req, res) => {
+  try {
+    // Call the function to take a snapshot
+    await takeSnapshot();
+
+    // Return a success response
+    res.status(200).json({ message: 'Snapshot taken successfully' });
+  } catch (error) {
+    console.error(error);
+    // Return an error response
+    res.status(500).json({ error: 'Snapshot failed' });
+  }
+});
+
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
